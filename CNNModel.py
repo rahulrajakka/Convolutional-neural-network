@@ -26,3 +26,10 @@ avg_sales['product_id'] = avg_sales['product_id'] / avg_sales['product_id'].max(
 avg_sales['sales_week of year'] = avg_sales['sales_week of year'] / avg_sales['sales_week of year'].max()
 print("Data normalized.")
 print(avg_sales.head())
+
+
+# Prepare input and output data for the model
+print("Preparing input and output data for the model...")
+X = avg_sales[['product_id', 'sales_week of year']].values
+y = avg_sales['avg_sales_product_quantity'].values
+print("Input and output data prepared.")
