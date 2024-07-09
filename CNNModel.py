@@ -79,3 +79,44 @@ print("Model saved.")
 print("Loading the model...")
 model = load_model('cnn_sales_model.h5')
 print("Model loaded.")
+
+
+def model_predict(product_id, week, model):
+    print(f"Predicting for product_id: {product_id}, week: {week}...")
+    # Normalize inputs
+    max_product_id = avg_sales['product_id'].max()
+    max_week = avg_sales['sales_week of year'].max()
+    normalized_product_id = product_id / max_product_id
+    normalized_week = week / max_week
+
+    # Reshape and predict
+    input_data = np.array([[normalized_product_id, normalized_week]])
+    input_data = input_data.reshape((input_data.shape[0], input_data.shape[1], 1))
+    prediction = model.predict(input_data)
+
+    print(f"Prediction for product_id: {product_id}, week: {week}: {prediction[0][0]}")
+    return prediction[0][0]
+
+def forecast_sales_for_product(product_id, start_week, product_price, model):
+    print(f"Forecasting sales for product_id: {product_id} starting from week: {start_week}...")
+    # Initialize an empty list to store predictions
+    predictions = []
+
+    # Generate predictions for each week in the next 52 weeks
+    for week in range(start_week, start_week + 52):
+        # Ensure week numbers stay within 1 to 52
+        normalized_week = (week - 1) % 52 + 1
+        prediction = model_predict(product_id, normalized_week, model)
+        predictions.append(prediction)
+
+    # Create a DataFrame to store forecasted sales
+    forecast_df = pd.DataFrame({
+        'product_id': [product_id] * 52,
+        'sales_week of year': np.arange(start_week, start_week + 52) % 52 + 1,  # Week numbers 1 to 52
+        'forecasted_sales': predictions,
+        'product_price': [product_price] * 52
+    })
+
+    print(f"Forecast for product_id: {product_id} completed.")
+    return forecast_df
+
