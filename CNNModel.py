@@ -12,6 +12,9 @@ print("DataFrame columns:", df.columns)
 # Remove rows where any column contains a zero value
 df = df[(df != 0).all(axis=1)]
 
+# Remove rows with any null values
+df.dropna(inplace=True)
+
 # Calculate average sales
 print("Calculating average sales...")
 avg_sales = df.groupby(['product_id', 'sales_week of year'])['sales_product_quantity'].mean().reset_index()
