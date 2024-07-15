@@ -1,19 +1,31 @@
+import pandas as pd
+import numpy as np
 from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.layers import Dense, Conv1D, Flatten
-import pandas as pd
+from tensorflow.keras.optimizers import Adam
+from sklearn.model_selection import train_test_split
+
+
+
 
 # Load the sales data
 print("Loading sales data...")
-df = pd.read_csv('Download file and add file path ')
+df = pd.read_csv('sales_data.csv')
 print("Sales data loaded successfully.")
 print("DataFrame columns:", df.columns)
 
+# Data cleaning
+print("Cleaning sales data...")
+# Remove rows with any null values
+df.dropna(inplace=True)
 
 # Remove rows where any column contains a zero value
 df = df[(df != 0).all(axis=1)]
 
-# Remove rows with any null values
-df.dropna(inplace=True)
+print("Sales data cleaned successfully.")
+print("DataFrame shape after cleaning:", df.shape)
+print("DataFrame columns after cleaning:", df.columns)
+
 
 # Calculate average sales
 print("Calculating average sales...")
@@ -23,16 +35,12 @@ avg_sales.columns = ['product_id', 'sales_week of year', 'avg_sales_product_quan
 print("Average sales calculated.")
 print(avg_sales.head())
 
-
 # Normalize the data
 print("Normalizing the data...")
 avg_sales['product_id'] = avg_sales['product_id'] / avg_sales['product_id'].max()
 avg_sales['sales_week of year'] = avg_sales['sales_week of year'] / avg_sales['sales_week of year'].max()
 print("Data normalized.")
 print(avg_sales.head())
-
-
-
 
 # Prepare input and output data for the model
 print("Preparing input and output data for the model...")
@@ -83,7 +91,6 @@ print("Loading the model...")
 model = load_model('cnn_sales_model.h5')
 print("Model loaded.")
 
-
 def model_predict(product_id, week, model):
     print(f"Predicting for product_id: {product_id}, week: {week}...")
     # Normalize inputs
@@ -122,4 +129,17 @@ def forecast_sales_for_product(product_id, start_week, product_price, model):
 
     print(f"Forecast for product_id: {product_id} completed.")
     return forecast_df
+
+# Example usage
+product_id = 242  # Replace with the actual product_id you want to forecast
+start_week = 1  # Replace with the actual starting sales_week of year
+product_price = 29  # Replace with the actual product price
+
+# Generate the sales forecast DataFrame
+print(f"Generating sales forecast for product_id: {product_id}...")
+forecast_df = forecast_sales_for_product(product_id, start_week, product_price, model)
+
+# Save forecast DataFrame to CSV file
+forecast_df.to_csv(f'sales_forecast_52_weeks_product_{product_id}.csv', index=False)
+print(f"Forecast saved to sales_forecast_52_weeks_product_{product_id}.csv")
 
